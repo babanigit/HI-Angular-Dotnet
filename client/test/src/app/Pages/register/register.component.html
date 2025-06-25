@@ -1,0 +1,90 @@
+<div
+  class="container d-flex justify-content-center align-items-center min-vh-100 bg-light"
+>
+  <div class="card p-4 shadow rounded-4" style="width: 100%; max-width: 400px">
+    <h3 class="text-center mb-4 text-primary fw-semibold">Sign Up</h3>
+
+    <form #userForm="ngForm" (ngSubmit)="registerUser()">
+      <!-- username -->
+      <div class="mb-3">
+        <input
+          type="text"
+          id="username"
+          name="username"
+          class="form-control form-control-lg rounded-3"
+          placeholder="Username"
+          required
+          minlength="3"
+          #username="ngModel"
+          [(ngModel)]="registerData.username"
+        />
+        <small *ngIf="username.invalid && username.touched" class="text-danger">
+          {{ username.errors?.['required'] ? 'Name is required.' : '' }}
+          {{ username.errors?.['minlength'] ? 'At least 3 characters.' : '' }}
+        </small>
+      </div>
+
+      <!-- Email -->
+      <div class="mb-3">
+        <input
+          type="email"
+          id="email"
+          name="email"
+          class="form-control form-control-lg rounded-3"
+          placeholder="Email Address"
+          required
+          #email="ngModel"
+          [(ngModel)]="registerData.email"
+        />
+        <small *ngIf="email.invalid && email.touched" class="text-danger">
+          {{ email.errors?.['required'] ? 'Email is required.' : '' }}
+          {{ email.errors?.['email'] ? 'Enter a valid email.' : '' }}
+        </small>
+      </div>
+
+      <!-- Password -->
+      <div class="mb-4 position-relative">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          id="password"
+          name="password"
+          class="form-control form-control-lg rounded-3 pe-5"
+          placeholder="Password"
+          required
+          minlength="6"
+          #password="ngModel"
+          [(ngModel)]="registerData.password"
+        />
+        <small *ngIf="password.invalid && password.touched" class="text-danger">
+          {{ password.errors?.['required'] ? 'Password is required.' : '' }}
+          {{ password.errors?.['minlength'] ? 'At least 6 characters.' : '' }}
+        </small>
+
+        <!-- Toggle Button -->
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2"
+          (click)="showPassword = !showPassword"
+          tabindex="-1"
+        >
+          {{ showPassword ? "Hide" : "Show" }}
+        </button>
+      </div>
+
+      <!-- from dotnet identity error -->
+      <div *ngIf="identityErrors.length > 0" class="alert alert-danger mt-2">
+        <ul class="mb-0 ps-3">
+          <li *ngFor="let err of identityErrors">{{ err }}</li>
+        </ul>
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary btn-lg w-100 rounded-3"
+        [disabled]="userForm.invalid"
+      >
+        Create Account
+      </button>
+    </form>
+  </div>
+</div>

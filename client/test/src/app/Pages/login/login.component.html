@@ -1,0 +1,82 @@
+<div
+  class="container d-flex justify-content-center align-items-center min-vh-100"
+>
+  <div
+    class="card shadow-lg p-4 rounded-4"
+    style="max-width: 400px; width: 100%"
+  >
+    <h3 class="text-center mb-4 fw-semibold">Login</h3>
+
+    <form #loginForm="ngForm" (ngSubmit)="loginUser()">
+      <!-- username -->
+      <div class="form-floating mb-3">
+        <input
+          type="username"
+          id="username"
+          name="username"
+          class="form-control"
+          placeholder="Username"
+          required
+          [(ngModel)]="loginData.username"
+          #username="ngModel"
+        />
+        <label for="username">Username</label>
+        <div
+          class="text-danger mt-1"
+          *ngIf="username.invalid && username.touched"
+        >
+          <small *ngIf="username.errors?.['required']"
+            >usename is required.</small
+          >
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="form-floating mb-3">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          id="password"
+          name="password"
+          class="form-control"
+          placeholder="Password"
+          required
+          [(ngModel)]="loginData.password"
+          #password="ngModel"
+        />
+        <label for="password">Password</label>
+        <div
+          class="text-danger mt-1"
+          *ngIf="password.invalid && password.touched"
+        >
+          <small>Password is required.</small>
+        </div>
+
+        <!-- Toggle Button -->
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2"
+          (click)="showPassword = !showPassword"
+          tabindex="-1"
+        >
+          {{ showPassword ? "Hide" : "Show" }}
+        </button>
+      </div>
+
+      <!-- from dotnet identity error -->
+      <div *ngIf="identityErrors.length > 0" class="alert alert-danger mt-2">
+        <ul class="mb-0 ps-3">
+          <li *ngFor="let err of identityErrors">{{ err }}</li>
+        </ul>
+      </div>
+
+      <!-- Submit -->
+      <button
+        type="submit"
+        class="btn btn-dark w-100 rounded-pill py-2"
+        [disabled]="loginForm.invalid"
+      >
+        Sign In
+      </button>
+    </form>
+  </div>
+</div>

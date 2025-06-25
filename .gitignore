@@ -1,0 +1,35 @@
+node_modules
+.fake
+wwwroot/assets/images/*
+
+
+## Build Results
+bin/
+obj/
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Visual Studio files
+.vscode/
+*.code-workspace
+
+## ASP.NET files
+wwwroot/assets/images/*   # Ignore image contents only
+appsettings.*.json        # Ignore environment-specific settings if needed
+appsettings.Development.json
+appsettings.json
+
+## Logs
+*.log
+
+## Secrets
+secrets.json
+
+## DotNet CLI / Temp files
+project.lock.json
+project.fragment.lock.json
+artifa

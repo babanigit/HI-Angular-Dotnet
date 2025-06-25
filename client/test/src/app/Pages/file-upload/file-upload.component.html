@@ -1,0 +1,121 @@
+<div class="container">
+  <h2>Image Upload Manager</h2>
+
+  <!-- Single File Upload -->
+  <div class="upload-section">
+    <h3>Single Image Upload</h3>
+    <div
+      class="upload-area"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+    >
+      <input
+        type="file"
+        #singleFileInput
+        (change)="onSingleFileSelected($event)"
+        accept="image/*"
+        style="display: none"
+      />
+      <button (click)="singleFileInput.click()" class="btn btn-primary">
+        Choose Image
+      </button>
+      <p>or drag and drop an image here</p>
+    </div>
+
+    <div *ngIf="selectedFile" class="file-info">
+      <p><strong>Selected:</strong> {{ selectedFile.name }}</p>
+      <p><strong>Size:</strong> {{ formatFileSize(selectedFile.size) }}</p>
+      <button
+        (click)="uploadSingleFile()"
+        [disabled]="uploading"
+        class="btn btn-success"
+      >
+        {{ uploading ? "Uploading..." : "Upload" }}
+      </button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div *ngIf="uploadProgress > 0" class="progress">
+      <div
+        class="progress-bar"
+        [style.width.%]="uploadProgress"
+        role="progressbar"
+      >
+        {{ uploadProgress }}%
+      </div>
+    </div>
+  </div>
+
+  <!-- Multiple Files Upload -->
+  <div class="upload-section">
+    <h3>Multiple Images Upload</h3>
+    <input
+      type="file"
+      #multipleFileInput
+      (change)="onMultipleFilesSelected($event)"
+      accept="image/*"
+      multiple
+    />
+
+    <div *ngIf="selectedFiles.length > 0" class="files-list">
+      <h4>Selected Files ({{ selectedFiles.length }}):</h4>
+      <ul>
+        <li *ngFor="let file of selectedFiles">
+          {{ file.name }} ({{ formatFileSize(file.size) }})
+          <button (click)="removeFile(file)" class="btn btn-sm btn-danger">
+            Remove
+          </button>
+        </li>
+      </ul>
+      <button
+        (click)="uploadMultipleFiles()"
+        [disabled]="uploadingMultiple"
+        class="btn btn-success"
+      >
+        {{ uploadingMultiple ? "Uploading..." : "Upload All" }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Upload Results -->
+  <div *ngIf="uploadResults.length > 0" class="results-section">
+    <h3>Upload Results</h3>
+    <div
+      *ngFor="let result of uploadResults"
+      [class]="'alert ' + (result.success ? 'alert-success' : 'alert-danger')"
+    >
+      <strong>{{ result.originalFileName }}:</strong>
+      <span *ngIf="result.success"> Uploaded successfully!</span>
+      <span *ngIf="!result.success"> {{ result.error }}</span>
+    </div>
+  </div>
+
+  <!-- Image Gallery -->
+  <div class="gallery-section">
+    <h3>Uploaded Images</h3>
+    <button (click)="loadImages()" class="btn btn-info">Refresh Gallery</button>
+
+    <div class="image-gallery">
+      <div *ngFor="let image of uploadedImages" class="image-card">
+        <img
+          [src]="getImageUrl(image.fileName)"
+          [alt]="image.fileName"
+          (error)="onImageError($event, image)"
+          loading="lazy"
+        />
+        <div class="image-info">
+          <p><strong>File:</strong> {{ image.fileName }}</p>
+          <p><strong>Size:</strong> {{ formatFileSize(image.fileSize) }}</p>
+          <p><strong>Uploaded:</strong> {{ formatDate(image.createdAt) }}</p>
+          <button
+            (click)="copyImageUrl(image)"
+            class="btn btn-sm btn-secondary"
+          >
+            Copy URL
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

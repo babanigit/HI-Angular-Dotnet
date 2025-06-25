@@ -1,0 +1,263 @@
+<div class="container mt-4" style="max-width: 800px">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 text-primary mb-0">My Tasks</h1>
+    <button
+      class="btn btn-primary d-flex align-items-center gap-2"
+      (click)="showAddForm = !showAddForm"
+    >
+      <i class="fas fa-plus"></i>
+      <span>Add Task</span>
+    </button>
+  </div>
+
+  <!-- Add/Edit Form -->
+  <div class="card mb-4" [class.d-none]="!showAddForm && !editingTodo">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">{{ editingTodo ? "Edit Task" : "Add New Task" }}</h5>
+    </div>
+    <div class="card-body">
+      <form
+        (ngSubmit)="editingTodo ? updateTodo() : addTodo()"
+        #todoForm="ngForm"
+      >
+        <div class="row">
+          <div class="col-md-8">
+            <input
+              type="text"
+              class="form-control mb-3"
+              [(ngModel)]="newTodoTitle"
+              name="title"
+              placeholder="Task title"
+              required
+            />
+            <textarea
+              class="form-control mb-3"
+              [(ngModel)]="newTodoDesc"
+              name="text"
+              placeholder="Task description"
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="col-md-4">
+            <div class="form-check mb-3">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                [(ngModel)]="isImportant"
+                name="important"
+                id="important"
+              />
+              <label class="form-check-label" for="important">
+                <i class="fas fa-flag text-danger"></i> Mark as Important
+              </label>
+            </div>
+            <input
+              type="date"
+              class="form-control mb-3"
+              [(ngModel)]="dueDate"
+              name="dueDate"
+              placeholder="Due date"
+            />
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="!todoForm.valid || loading"
+          >
+            <span
+              *ngIf="loading"
+              class="spinner-border spinner-border-sm me-2"
+            ></span>
+            <i *ngIf="!loading" class="fas fa-check"></i>
+            {{ editingTodo ? "Update Task" : "Add Task" }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            [disabled]="loading"
+            (click)="cancelEdit()"
+          >
+            <i class="fas fa-times"></i>
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Filters and Controls -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <!-- Tab Filters -->
+      <div class="btn-group mb-3 w-100" role="group">
+        <button
+          *ngFor="let tab of tabs"
+          type="button"
+          class="btn"
+          [class.btn-primary]="activeTab === tab.key"
+          [class.btn-outline-primary]="activeTab !== tab.key"
+          (click)="setActiveTab(tab.key)"
+        >
+          {{ tab.label }} ({{ getFilteredCount(tab.key) }})
+        </button>
+      </div>
+
+      <!-- Sort Controls -->
+      <div class="d-flex flex-wrap gap-2">
+        <small class="text-muted align-self-center me-2">Sort by:</small>
+        <button
+          *ngFor="let sort of sortOptions"
+          type="button"
+          class="btn btn-sm"
+          [class.btn-dark]="sortBy === sort.key"
+          [class.btn-outline-dark]="sortBy !== sort.key"
+          (click)="setSortBy(sort.key)"
+        >
+          <i [class]="sort.icon"></i>
+          {{ sort.label }}
+          <i
+            *ngIf="sortBy === sort.key"
+            class="fas ms-1"
+            [class.fa-sort-up]="sortDirection === 'asc'"
+            [class.fa-sort-down]="sortDirection === 'desc'"
+          >
+          </i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Todo List -->
+  <div class="row">
+    <div class="col-12">
+      <!-- Loading Spinner -->
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 text-muted">Loading tasks...</p>
+      </div>
+
+      <!-- Error Message -->
+      <div
+        *ngIf="error && !loading"
+        class="alert alert-danger d-flex align-items-center"
+      >
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        {{ error }}
+        <button
+          class="btn btn-sm btn-outline-danger ms-auto"
+          (click)="loadTodos()"
+        >
+          <i class="fas fa-redo"></i> Retry
+        </button>
+      </div>
+
+      <div
+        *ngIf="!loading && !error && getSortedTodos().length === 0"
+        class="text-center py-5"
+      >
+        <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No {{ activeTab }} tasks found</h4>
+        <button
+          *ngIf="activeTab === 'all'"
+          class="btn btn-primary mt-3"
+          (click)="showAddForm = true"
+        >
+          <i class="fas fa-plus"></i>
+          Add your first task
+        </button>
+      </div>
+
+      <ng-container *ngIf="!loading">
+        <div *ngFor="let todo of getSortedTodos()" class="card mb-3 todo-card">
+          <div class="card-body">
+            <div class="d-flex align-items-start">
+              <!-- Checkbox -->
+              <div class="form-check me-3">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  [checked]="todo.status === 1"
+                  (change)="toggleTodo(todo)"
+                  [disabled]="loading"
+                  [id]="'todo-' + todo.id"
+                />
+                <label
+                  class="form-check-label"
+                  [for]="'todo-' + todo.id"
+                ></label>
+              </div>
+
+              <!-- Content -->
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center mb-2">
+                  <h5
+                    class="mb-0 me-2"
+                    [class.text-decoration-line-through]="todo.status === 1"
+                    [class.text-muted]="todo.status === 1"
+                  >
+                    {{ todo.title }}
+                  </h5>
+                  <span *ngIf="todo.isImportant" class="badge bg-danger ms-2">
+                    <i class="fas fa-flag"></i> Important
+                  </span>
+                </div>
+
+                <p
+                  class="text-muted mb-2"
+                  [class.text-decoration-line-through]="todo.status === 1"
+                >
+                  {{ todo.text }}
+                </p>
+
+                <!-- Meta Information -->
+                <div class="d-flex flex-wrap gap-3 small text-muted">
+                  <span>
+                    <i class="fas fa-clock"></i>
+                    {{ todo.updatedAt ? "Updated" : "Created" }}:
+                    {{ formatDate(todo.updatedAt || todo.createdAt) }}
+                  </span>
+                  <span *ngIf="todo.dueDate">
+                    <i class="fas fa-calendar"></i>
+                    Due: {{ formatDate(todo.dueDate) }}
+                  </span>
+                  <span
+                    class="badge"
+                    [class.bg-success]="todo.status === 1"
+                    [class.bg-warning]="todo.status === 0"
+                  >
+                    {{ todo.status === 1 ? "Completed" : "Pending" }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="d-flex gap-2">
+                <button
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="editTodo(todo)"
+                  [disabled]="loading"
+                  title="Edit"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteTodoBtn(todo.id)"
+                  [disabled]="loading"
+                  title="Delete"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

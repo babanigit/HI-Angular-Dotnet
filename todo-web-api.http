@@ -1,0 +1,6 @@
+@todo_web_api_HostAddress = http://localhost:5288
+
+GET {{todo_web_api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,43 @@
+{
+  "users": [
+    {
+      "id": "0ed7f0e7-617a-4f91-aa4c-2d6c6d3f74ed",
+      "name": "panchalfsff",
+      "mail": "panchalfsff@ffaf",
+      "password": "panchalfsff@ffaf",
+      "todo_id": []
+    }
+  ],
+  "todos": [
+    {
+      "id": "94524376-4675-4fa4-a2b3-458c53332907",
+      "title": "hello there",
+      "completed": false,
+      "description": ""
+    },
+    {
+      "id": "1c3f833e-4773-4c5d-8289-e56ca265307e",
+      "title": "how are you",
+      "completed": false,
+      "description": ""
+    },
+    {
+      "id": "168f0ce0-c58f-4e50-8de7-3c1a0ab09cfb",
+      "title": "react",
+      "completed": false,
+      "description": ""
+    },
+    {
+      "id": "da0fcecf-958b-45d0-ac0e-376aa7a88fe5",
+      "title": "angular",
+      "completed": false,
+      "description": ""
+    },
+    {
+      "id": "fed9b0e7-7606-4b29-a8ac-679615c00075",
+      "title": "hello",
+      "completed": false,
+      "description": ""
+    }
+  ]
+}

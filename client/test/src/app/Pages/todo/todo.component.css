@@ -1,0 +1,53 @@
+.done {
+  text-decoration: line-through;
+}
+.todo-app {
+  max-width: 400px;
+  margin: auto;
+}
+input[type="text"] {
+  width: 70%;
+  padding: 5px;
+}
+button {
+  margin-left: 5px;
+}
+
+.crossed {
+  text-decoration: line-through;
+  color: #6c757d; /* muted */
+}
+
+.todo-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-left: 4px solid #dee2e6;
+}
+
+.todo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.todo-card:has(.form-check-input:checked) {
+  border-left-color: #198754;
+  opacity: 0.8;
+}
+
+.btn-group .btn {
+  flex: 1;
+}
+
+.form-check-input:checked {
+  background-color: #198754;
+  border-color: #198754;
+}
+
+@media (max-width: 768px) {
+  .d-flex.gap-2 {
+    flex-direction: column;
+  }
+
+  .btn-group {
+    flex-direction: column;
+  }
+}
