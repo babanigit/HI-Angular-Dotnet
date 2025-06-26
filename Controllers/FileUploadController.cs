@@ -1,23 +1,33 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using System.Threading.Tasks;
 using todo_web_api.Dtos;
+using todo_web_api.Extensions;
 using todo_web_api.Interface;
+using todo_web_api.Models;
 
 [ApiController]
 [Route("api/[controller]")]
 public class FileUploadController : ControllerBase
 {
+    private readonly UserManager<AppUser> _userManager;
     private readonly IWebHostEnvironment _environment;
     private readonly ILogger<FileUploadController> _logger;
 
     private readonly IPhotoService _photoService;
 
-    public FileUploadController(IWebHostEnvironment environment, ILogger<FileUploadController> logger, IPhotoService photoService)
+    private readonly ICloudinaryRespository _ClouRepo;
+
+    public FileUploadController(ICloudinaryRespository ClouRepo, UserManager<AppUser> userManager, IWebHostEnvironment environment, ILogger<FileUploadController> logger, IPhotoService photoService)
     {
+        _userManager = userManager;
         _environment = environment;
         _logger = logger;
         _photoService = photoService;
+
+        _ClouRepo = ClouRepo;
 
     }
 
@@ -192,61 +202,65 @@ public class FileUploadController : ControllerBase
         }
     }
 
-    [HttpPost("cloudinary")]
-    public async Task<IActionResult> usingCloudinaryAsync([FromForm] PhotoUploadDto dto)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        foreach (var kvp in ModelState)
-        {
-            Console.WriteLine($"Key: {kvp.Key}");
-            foreach (var error in kvp.Value.Errors)
-            {
-                Console.WriteLine($"  Error: {error.ErrorMessage}");
-            }
-        }
-
-
-        if (dto.File == null || dto.File.Length == 0)
-            return BadRequest("No file uploaded.");
-
-        var fileName = dto.File.FileName;
-
-        return Ok(new
-        {
-            message = "Received file successfully",
-            fileName,
-            fileSize = dto.File.Length
-        });
-    }
-
-
+    [Authorize]
     [HttpPost("cloudinary-direct")]
     public async Task<IActionResult> UploadDirect([FromForm] IFormFile file)
     {
+
         if (file == null)
             return BadRequest("No file uploaded.");
 
         var photoResult = await _photoService.AddPhotoAsync(file);
 
-        return Ok(new
+        // get the username by token
+        var username = User.GetUsername();
+        var appUser = await _userManager.FindByNameAsync(username);
+        if (appUser == null)
+            return Unauthorized("User not found");
+
+        var clouModel = new CloudinaryImage
         {
-            photoResult,
-            message = "Upload succeeded",
-            fileName = file.FileName
-        });
+            ImageUrl = photoResult.Url.ToString(),
+            AppUserId = appUser.Id
+        };
+
+        await _ClouRepo.CreateAsync(clouModel);
+
+        if (clouModel == null)
+            return StatusCode(500, "Could not create");
+        else
+            // return CreatedAtAction(nameof(AddTodo), new { id = todoModel.Id }, todoModel);
+
+            return Ok(new
+            {
+                clouModel,
+                photoResult,
+                message = "Upload succeeded",
+                fileName = file.FileName
+            });
     }
 
+    // [Authorize]
+    // [HttpGet("cloudinary-images")]
+    // public async Task<IActionResult> GetAllCloudinaryImages()
+    // {
+    //     var images = await _photoService.GetAllPhotosAsync();
+    //     return Ok(new
+    //     {
+    //         count = images.Count,
+    //         images
+    //     });
+    // }
+
+    [Authorize]
     [HttpGet("cloudinary-images")]
-    public async Task<IActionResult> GetAllCloudinaryImages()
+    public async Task<IActionResult> GetCloudinaryimages()
     {
-        var images = await _photoService.GetAllPhotosAsync();
-        return Ok(new
-        {
-            count = images.Count,
-            images
-        });
+        var username = User.GetUsername();
+        var appUser = await _userManager.FindByNameAsync(username);
+        var cloudinaryImg = await _ClouRepo.GetCloudinary(appUser);
+
+        return Ok(cloudinaryImg);
     }
 
 

@@ -53,7 +53,6 @@ namespace todo_web_api.Controllers
 
             // Check for duplicate todo by text
             var userTodos = await _todoRepo.GetUserTodo(appUser);
-
             if (userTodos.Any(e => e.Text.ToLower() == dto.Text.ToLower()))
                 return BadRequest("A todo with the same text already exists");
 

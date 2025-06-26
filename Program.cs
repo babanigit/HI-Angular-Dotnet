@@ -95,6 +95,8 @@ builder.Services.AddScoped<UserServiceTrail>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<ITodoRespository, TodoRespository>();
+builder.Services.AddScoped<ICloudinaryRespository, CloudinaryRespository>();
+
 
 // configured the cloudinary settings
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
