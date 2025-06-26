@@ -1,3 +1,5 @@
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -202,6 +204,8 @@ public class FileUploadController : ControllerBase
         }
     }
 
+
+    // cloudinary images
     [Authorize]
     [HttpPost("cloudinary-direct")]
     public async Task<IActionResult> UploadDirect([FromForm] IFormFile file)
@@ -240,18 +244,6 @@ public class FileUploadController : ControllerBase
             });
     }
 
-    // [Authorize]
-    // [HttpGet("cloudinary-images")]
-    // public async Task<IActionResult> GetAllCloudinaryImages()
-    // {
-    //     var images = await _photoService.GetAllPhotosAsync();
-    //     return Ok(new
-    //     {
-    //         count = images.Count,
-    //         images
-    //     });
-    // }
-
     [Authorize]
     [HttpGet("cloudinary-images")]
     public async Task<IActionResult> GetCloudinaryimages()
@@ -264,4 +256,58 @@ public class FileUploadController : ControllerBase
     }
 
 
+    // cloudinary upload raw files ,pdf, zip
+
+    [Authorize]
+    [HttpPost("upload-pdf")]
+    public async Task<IActionResult> UploadPdf([FromForm] IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("No file uploaded.");
+
+        // Optional: Validate extension
+        var ext = Path.GetExtension(file.FileName).ToLower();
+        if (ext != ".pdf")
+            return BadRequest("Only PDF files are allowed.");
+
+        // Upload to Cloudinary
+        var uploadResult = await _photoService.AddPdfAsync(file);
+
+        var username = User.GetUsername();
+        var appUser = await _userManager.FindByNameAsync(username);
+        Console.WriteLine($" the user is:- {appUser} ");
+        if (appUser == null)
+            return Unauthorized("User not found.");
+
+        if (uploadResult == null || uploadResult.Url == null || uploadResult.ResourceType == null)
+            return StatusCode(500, "Cloudinary upload failed or returned null values.");
+
+        var pdfRecord = new todo_web_api.Models.UploadResult
+        {
+            Url = uploadResult.Url.ToString(),
+            ResourceType = uploadResult.ResourceType,
+            AppUserId = appUser.Id
+        };
+        await _ClouRepo.CreateAsyncPdf(pdfRecord);
+
+        return Ok(new
+        {
+            pdfRecord.Id,
+            url = pdfRecord.Url,
+            resourceType = pdfRecord.ResourceType,
+            pdfRecord.AppUser
+        });
+    }
+
+
+    [Authorize]
+    [HttpGet("get-pdfs")]
+    public async Task<IActionResult> GetCloudinaryPDF()
+    {
+        var username = User.GetUsername();
+        var appUser = await _userManager.FindByNameAsync(username);
+        var Clou_Pdf = await _ClouRepo.GetPdfs(appUser);
+
+        return Ok(Clou_Pdf);
+    }
 }

@@ -14,5 +14,6 @@ namespace todo_web_api.Data
 
         public DbSet<Todo> Todos { get; set; }
         public DbSet<CloudinaryImage> cloudinaryImages { get; set; }
+        public DbSet<UploadResult> UploadResults { get; set; }
     }
 }

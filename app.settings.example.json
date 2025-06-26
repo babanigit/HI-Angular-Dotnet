@@ -1,0 +1,15 @@
+{
+    "ConnectionStrings": {
+        "DefaultConnection": "Host=IP/NONE;Database=NONE;Username=NONE;Password=NONE"
+    },
+    "CloudinarySettings": {
+        "CloudName": "",
+        "ApiKey": "",
+        "ApiSecret": ""
+    },
+    "JWT": {
+        "Issuer": "http://localhost:5288",
+        "Audience": "http://localhost:5288",
+        "SigningKey": ""
+    }
+}

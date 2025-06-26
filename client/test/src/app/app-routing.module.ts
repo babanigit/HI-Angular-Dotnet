@@ -4,6 +4,15 @@ import { AuthGuard } from './util/auth.guard';
 
 const routes: Routes = [
   {
+  path: 'home',
+    loadChildren: () =>
+      import('./Pages/home/home.module').then(
+        (m) => m.HomeModule
+      ),
+    // canActivate: [AuthGuard],
+
+  },
+  {
     path: 'file-uploader',
     loadChildren: () =>
       import('./Pages/file-upload/file-upload.module').then(

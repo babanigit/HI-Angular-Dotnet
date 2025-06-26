@@ -33,6 +33,9 @@ namespace todo_web_api.Services
             var uploadResult = new ImageUploadResult();
             if (file.Length > 0)
             {
+
+                // var fileExtension = Path.GetExtension(file.FileName).ToLower();
+
                 using var stream = file.OpenReadStream();
                 var uploadParams = new ImageUploadParams
                 {
@@ -40,6 +43,8 @@ namespace todo_web_api.Services
                     Transformation = new Transformation().Height(500).Width(500).Crop("fill").Gravity("face")
                 };
                 uploadResult = await _cloundinary.UploadAsync(uploadParams);
+
+
             }
             return uploadResult;
         }
@@ -68,6 +73,30 @@ namespace todo_web_api.Services
 
             return imageUrls;
         }
+
+
+        public async Task<RawUploadResult> AddPdfAsync(IFormFile file)
+        {
+            if (file.Length > 0)
+            {
+                using var stream = file.OpenReadStream();
+
+                var uploadParams = new RawUploadParams
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    PublicId = Path.GetFileNameWithoutExtension(file.FileName)
+                };
+
+                var uploadResult = await _cloundinary.UploadAsync(uploadParams);
+                return uploadResult;
+            }
+
+            return null!;
+        }
+
+
+
+
 
     }
 }

@@ -12,5 +12,8 @@ namespace todo_web_api.Interface
 
         Task<List<string>> GetAllPhotosAsync();
 
+        Task<RawUploadResult> AddPdfAsync(IFormFile file);
+
+
     }
 }

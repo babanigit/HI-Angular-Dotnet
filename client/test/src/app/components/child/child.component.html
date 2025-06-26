@@ -1,0 +1,16 @@
+<h3>this is child compo</h3>
+<div>
+  <span> data from parent :- </span>
+  {{ name }}
+</div>
+
+<label for="framework">
+  <span>sending to parent compo :- </span>
+  <input
+    type="text"
+    id="framework"
+    [ngModel]="value"
+    (ngModelChange)="onValueChange($event)"
+    placeholder="Type here..."
+  />
+</label>

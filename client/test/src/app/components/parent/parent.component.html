@@ -1,0 +1,19 @@
+<h3>this is parent compo</h3>
+
+<label for="framework">
+  <span>sending to child compo :- </span>
+  <input type="text" id="framework" [(ngModel)]="username" />
+</label>
+
+<div>
+  <span> data from child :- </span>
+  {{ message }}
+</div>
+
+<!-- <app-child [(value)]="message" 
+(valueChanged)="handleChildValue($event)" 
+[name]="username"> </app-child> -->
+
+<app-child [(value)]="message" 
+[name]="username"> </app-child>
+

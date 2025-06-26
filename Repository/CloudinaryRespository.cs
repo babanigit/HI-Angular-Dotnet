@@ -16,6 +16,7 @@ namespace todo_web_api.Respository
             _context = context;
         }
 
+        // images upload
         public async Task<CloudinaryImage> CreateAsync(CloudinaryImage CI)
         {
             await _context.cloudinaryImages.AddAsync(CI);
@@ -30,33 +31,33 @@ namespace todo_web_api.Respository
                 {
                     Id = CI.Id,
                     ImageUrl = CI.ImageUrl,
+                    AppUserId = CI.AppUserId
                 }
             ).ToListAsync();
         }
 
-        public async Task<List<Todo>> GetUserTodo(AppUser user)
+        // raw for pdf, zip
+        public async Task<todo_web_api.Models.UploadResult> CreateAsyncPdf(todo_web_api.Models.UploadResult UP)
         {
-            // throw new NotImplementedException();
+            await _context.UploadResults.AddAsync(UP);
+            await _context.SaveChangesAsync();
+            return UP;
+        }
 
-            return await _context.Todos.Where(u => u.AppUserId == user.Id).Select(
-                todo => new Todo
+        public async Task<List<todo_web_api.Models.UploadResult>> GetPdfs(AppUser user)
+        {
+            return await _context.UploadResults.Where(u => u.AppUserId == user.Id).Select(
+                UP => new todo_web_api.Models.UploadResult
                 {
-                    Id = todo.Id,
-                    Title = todo.Title,
-                    Text = todo.Text,
-                    Status = todo.Status,
-                    CreatedAt = todo.CreatedAt,
-                    UpdatedAt = todo.UpdatedAt,
-                    DueDate = todo.DueDate,
-                    IsImportant = todo.IsImportant,
-                    CompletedAt = todo.CompletedAt,
-                    IsDeleted = todo.IsDeleted
-
-                    // AppUserId = todo.AppUserId,
-                    // AppUser = todo.AppUser
+                    Id = UP.Id,
+                    Url = UP.Url,
+                    ResourceType = UP.ResourceType,
+                    // AppUser = UP.AppUser,
+                    AppUserId = UP.AppUserId
                 }
             ).ToListAsync();
         }
+
     }
 
 }
